@@ -2183,13 +2183,16 @@ def react_frontend_fixed(request):
     from django.contrib import messages
     from django.shortcuts import redirect
     
-    # Check if user is already authenticated and show dashboard
+    # Check if user is already authenticated and has employee profile
     if request.user.is_authenticated:
-        # If user is already logged in, show the dashboard
-        user = request.user
-        user_name = user.first_name or user.email.split('@')[0] if user.email else 'Employee'
-        
-        html_content = f"""
+        try:
+            # Check if user has an employee profile
+            employee_profile = request.user.employee_profile
+            # If user is already logged in and has employee profile, show the dashboard
+            user = request.user
+            user_name = user.first_name or user.email.split('@')[0] if user.email else 'Employee'
+            
+            html_content = f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -2499,9 +2502,21 @@ def react_frontend_fixed(request):
             </script>
         </body>
         </html>
-        """
-        
-        return HttpResponse(html_content, content_type='text/html')
+            """
+            
+            return HttpResponse(html_content, content_type='text/html')
+            
+        except:
+            # User is authenticated but has no employee profile
+            # Check if they're staff/admin and redirect appropriately
+            if request.user.is_staff or request.user.is_superuser:
+                messages.info(request, 'You are logged in as an administrator. Access the admin panel instead.')
+                return redirect('/')
+            else:
+                # User has no employee profile and is not staff - show error and logout
+                from django.contrib.auth import logout
+                logout(request)
+                messages.error(request, 'Your account is not configured as an employee. Please contact your administrator.')
     
     # Handle login form submission for anonymous users
     if request.method == 'POST':
@@ -2516,13 +2531,22 @@ def react_frontend_fixed(request):
                 if user.is_active:
                     login(request, user)
                     
-                    # Determine redirect based on user type
-                    if user.is_staff or user.is_superuser:
-                        messages.success(request, f'Welcome back, {user.first_name or user.email}! Redirecting to admin area.')
-                        return redirect('/')
-                    else:
+                    # Determine redirect based on user type and employee profile
+                    try:
+                        # Check if user has an employee profile
+                        employee_profile = user.employee_profile
+                        # User has employee profile - redirect to employee portal
                         messages.success(request, f'Welcome back, {user.first_name or user.email}! Taking you to your dashboard.')
                         return redirect('/employee/')  # This will now show the dashboard
+                    except:
+                        # User has no employee profile - check if they're staff/admin
+                        if user.is_staff or user.is_superuser:
+                            messages.success(request, f'Welcome back, {user.first_name or user.email}! Redirecting to admin area.')
+                            return redirect('/')
+                        else:
+                            # User is neither employee nor staff - show error
+                            messages.error(request, 'Your account is not configured as an employee. Please contact your administrator.')
+                            return redirect('/employee/')
                 else:
                     messages.error(request, 'Your account is inactive. Please contact your administrator.')
             else:
