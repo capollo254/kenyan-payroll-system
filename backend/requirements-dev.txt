@@ -1,0 +1,21 @@
+# Includes the main requirements file
+-r requirements.txt
+
+# Testing framework
+# Provides a cleaner testing experience with Pytest
+pytest==8.2.2
+
+# A test runner for Django that uses Pytest
+pytest-django==4.8.0
+
+# A factory library for creating test fixtures easily
+factory-boy==3.3.0
+
+# Linter for enforcing code style and catching errors
+flake8==7.1.0
+
+# Tool for automatically formatting code to adhere to PEP 8
+black==24.4.2
+
+# Tool for viewing Celery tasks and queues in real-time
+flower==2.0.1

@@ -1,0 +1,155 @@
+/* static/admin/css/p9_admin.css */
+
+#auto-populate-controls {
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+#populate-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#populate-btn:hover {
+    background: #0056b3;
+}
+
+#populate-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+#populate-status {
+    min-height: 20px;
+}
+
+.p9-bulk-actions {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.p9-bulk-actions h3 {
+    margin-top: 0;
+    color: #495057;
+}
+
+.bulk-generate-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.bulk-generate-btn:hover {
+    background: #1e7e34;
+    color: white;
+    text-decoration: none;
+}
+
+.payroll-data-summary {
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.payroll-data-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+    color: #721c24;
+}
+
+/* Bulk generation form styling */
+.bulk-generate-form {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bulk-generate-form h2 {
+    color: #495057;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    max-width: 300px;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.employee-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    background: white;
+}
+
+.employee-checkbox {
+    display: block;
+    padding: 5px 0;
+}
+
+.employee-checkbox input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.submit-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+.cancel-link {
+    margin-left: 10px;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.cancel-link:hover {
+    color: #495057;
+    text-decoration: underline;
+}

@@ -1,0 +1,53 @@
+/backend/
+├── kenyan_payroll_project/
+│   ├── __init__.py																			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── asgi.py																				#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── settings.py           # Global project settings (database, installed apps, etc.)	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── urls.py               # Main URL router for the entire project						#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   └── wsgi.py																				#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+├── apps/                     # A good practice to keep all your Django apps in one place
+│   ├── core/                 # For core functionalities like user authentication, company data, and user roles
+│   │   ├── models.py         # User, Company, and Profile models							#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── views.py																		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── serializers.py    # For API data serialization									#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   └── urls.py																			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── employees/            # Manages all employee-specific data
+│   │   ├── migrations/
+│   │   ├── models.py         # Employee, VoluntaryDeduction, Overtime models 			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── admin.py																	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── views.py          # API views for employee and deduction management			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── serializers.py																#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   └── urls.py           # Employee-specific API endpoints							#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── payroll/              # The core payroll processing engine
+│   │   ├── migrations/
+│   │   ├── models.py         # PayrollRun, Payslip, PayrollDeduction models		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── views.py          # The main payroll processing and management APIs		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── serializers.py															#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   └── urls.py           # API endpoints for payroll runs, payslips, etc.		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── reports/              # Handles all reporting and compliance file generation
+│   │   ├── models.py         # Models to track generated reports						#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── views.py          # API to trigger and download reports (KRA, NSSF, NHIF)	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   ├── utils.py          # Helper functions for formatting reports					#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   │   └── urls.py																		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   └── notifications/        # Manages email and in-app alerts
+│       ├── models.py																		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│       ├── views.py																		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│       ├── tasks.py          # Celery tasks for sending notifications in the background	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│       └── urls.py																			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+├── compliance/               # The crucial, isolated compliance engine
+│   ├── __init__.py
+│   ├── calc_paye.py          # PAYE calculation logic			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── calc_nssf.py          # NSSF calculation logic			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── calc_shif.py          # SHIF calculation logic			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── calc_ahl.py           # Affordable Housing Levy logic	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── calc_overtime.py      # Overtime calculation logic		#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   └── rates.py              # A dedicated file for all statutory rates and bands, making updates easier	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+├── static/                   # For Django's static files (not used much with a React frontend)
+├── media/                    # For user-uploaded files (e.g., employee documents)
+├── tests/                    # A comprehensive suite of tests
+│   ├── test_compliance.py    # Very important: tests for all statutory calculations	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   ├── test_api.py           # Tests for API endpoints									#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+│   └── test_models.py																	#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+├── manage.py																			#<<<<<<<<<<<UPDATED THE CODE>>>>>>>>>
+├── requirements.txt          # Python dependencies
+└── .env                      # Environment variables (API keys, secret keys, etc.)

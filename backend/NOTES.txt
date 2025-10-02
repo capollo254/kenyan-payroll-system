@@ -1,0 +1,1 @@
+VENV IS A VIRTUAL environment created. not part of the initial structure

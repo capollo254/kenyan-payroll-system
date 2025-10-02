@@ -1,0 +1,97 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | Django Admin{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/p9_admin.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='reports' %}">Reports</a>
+    &rsaquo; <a href="{% url 'admin:reports_p9report_changelist' %}">P9 Reports</a>
+    &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="bulk-generate-form">
+    <h2>🔄 Bulk P9 Generation</h2>
+    
+    <p>Generate P9 tax reports for multiple employees from their payroll data. The system will automatically calculate all tax fields based on actual payslip records.</p>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="tax_year">Tax Year:</label>
+            <select name="tax_year" id="tax_year" required>
+                {% for year in available_years %}
+                    <option value="{{ year }}" {% if year == default_tax_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Select Employees:</label>
+            <p style="font-size: 12px; color: #6c757d;">Leave unchecked to generate for all employees with payroll data</p>
+            
+            <div style="margin-bottom: 10px;">
+                <button type="button" id="select-all" class="btn btn-sm btn-secondary">Select All</button>
+                <button type="button" id="clear-all" class="btn btn-sm btn-secondary">Clear All</button>
+            </div>
+            
+            <div class="employee-list">
+                {% if employees %}
+                    {% for employee in employees %}
+                        <label class="employee-checkbox">
+                            <input type="checkbox" name="employees" value="{{ employee.id }}">
+                            {{ employee.full_name }} ({{ employee.user.email }})
+                        </label>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #6c757d;">No employees found with payroll data for {{ current_year }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="submit-btn">🚀 Generate P9 Reports</button>
+            <a href="{% url 'admin:reports_p9report_changelist' %}" class="cancel-link">Cancel</a>
+        </div>
+        
+        <div style="background: #e7f3ff; padding: 15px; border-radius: 4px; margin-top: 20px;">
+            <h4>📋 What happens during bulk generation:</h4>
+            <ul>
+                <li>✅ System fetches all payslips for selected employees in the tax year</li>
+                <li>🧮 Automatically calculates totals for basic salary, gross pay, PAYE tax, NSSF, etc.</li>
+                <li>📊 Creates monthly breakdown from individual payslip records</li>
+                <li>💰 Applies standard personal relief (KES 28,800) and other tax benefits</li>
+                <li>📄 Generates KRA-compliant P9 reports ready for PDF download</li>
+                <li>⚠️ Skips employees with existing P9 reports for the same year</li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('select-all').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('input[name="employees"]');
+    checkboxes.forEach(checkbox => checkbox.checked = true);
+});
+
+document.getElementById('clear-all').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('input[name="employees"]');
+    checkboxes.forEach(checkbox => checkbox.checked = false);
+});
+</script>
+{% endblock %}

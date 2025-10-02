@@ -1,0 +1,54 @@
+# requirements.txt
+
+# Django framework for the web application
+Django==5.0.7
+
+# Django REST Framework for building the API
+djangorestframework==3.16.0
+
+# Django filter for API filtering capabilities
+django-filter==24.2
+
+# Library to handle environment variables for secure settings
+# Using the python-decouple package is a simple, effective solution.
+python-decouple==3.8
+
+# CORS headers for handling cross-origin requests from the frontend
+django-cors-headers==4.9.0
+
+# Database connectors
+psycopg2-binary==2.9.7  # PostgreSQL (existing)
+django-mssql-backend>=2.8.1  # Microsoft SQL Server support
+pyodbc>=4.0.30  # ODBC driver for MSSQL
+
+# Asynchronous task queue for handling background processes
+# We'll include the Redis transport dependency here.
+celery[redis]==5.4.0
+
+# Redis client for Python, used by Celery and as a cache backend
+redis==5.0.1
+
+# Gunicorn is a popular WSGI HTTP Server for UNIX, used for production deployments
+gunicorn==22.0.0
+
+# PDF generation for P9 tax reports
+reportlab==4.0.4
+
+# Excel file generation for bulk reports
+openpyxl==3.1.2
+
+# Production deployment dependencies
+# WhiteNoise for serving static files in production
+whitenoise==6.5.0
+
+# Database URL parser for production databases
+dj-database-url==2.1.0
+
+# Environment-based configuration
+python-dotenv==1.0.0
+
+# Image processing for ImageField support
+Pillow==10.4.0
+
+# Additional common dependencies
+setuptools==68.2.2

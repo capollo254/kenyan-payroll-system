@@ -1,0 +1,33 @@
+/frontend/
+├── src/
+│   ├── components/           # Reusable UI components used across the app
+│   │   ├── common/           # Generic components (e.g., Button, InputField, Modal)
+│   │   ├── payslip/          # Components for displaying and formatting payslips
+│   │   ├── dashboard/        # Widgets for the admin dashboard
+│   │   └── forms/            # Reusable form components (e.g., AddEmployeeForm)
+│   ├── pages/                # Components that represent a full page/view
+│   │   ├── auth/
+│   │   │   ├── LoginPage.js	#UPDATED<<<<<<<<<<<<<<<<<<<<updated
+│   │   │   └── RegisterPage.js
+│   │   ├── admin/
+│   │   │   ├── DashboardPage.js #UPDATED<<<<<<<<<<<<<<<<<<<<<<<
+│   │   │   ├── EmployeeManagementPage.js
+│   │   │   ├── PayrollRunPage.js
+│   │   │   └── ReportsPage.js
+│   │   └── employee/
+│   │       ├── EmployeePortal.js
+│   │       ├── MyPayslipsPage.js		#UPDATED<<<<<<<<<<<<<<<<<<<<<<<<updated
+│   │       └── MyProfilePage.js
+│   ├── api/                  # All API calls, managed centrally with Axios #UPDATED>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+│   │   ├── employees.js
+│   │   ├── auth.js		
+│   │   └── payroll.js		
+│   ├── hooks/                # Custom React hooks for shared logic
+│   ├── utils/                # Helper functions (e.g., date formatting, data validation)
+│   ├── styles/               # CSS or styled components files
+│   ├── App.js                # Main application component with routing #UPDATED<<<<<<<<<<<<<<<<<<<<<<<<<<
+│   └── index.js
+├── public/                   # Static files (HTML, images, manifest, etc.)
+├── package.json				#UPDATED<<<<<<<<<<<<<<<<<<<<<<<<<
+├── README.md
+└── .env                      # Environment variables for the frontend
