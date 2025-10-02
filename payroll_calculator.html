@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenya Payroll Calculator - Calculate Your Net Pay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .results-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .tooltip {
+            display: inline-block;
+            margin-left: 5px;
+            width: 16px;
+            height: 16px;
+            background: #2E7D32;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            line-height: 16px;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .result-card h3 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+        }
+
+        .result-item.total {
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #2E7D32;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .feature-list {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .feature-list h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .feature-list ul {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Kenya Payroll Calculator</h1>
+            <p>Calculate your net pay with KRA-compliant deductions and reliefs</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">💼 Enter Your Details</h2>
+                
+                <form id="calculatorForm">
+                    <div class="form-group">
+                        <label for="gross_salary">
+                            Gross Monthly Salary (KSh) *
+                            <span class="tooltip" data-tooltip="Your total salary before any deductions">?</span>
+                        </label>
+                        <input type="number" id="gross_salary" name="gross_salary" required min="0" step="0.01" placeholder="e.g., 150000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pension_contribution">
+                            Pension Contribution (KSh)
+                            <span class="tooltip" data-tooltip="Monthly pension contribution (tax relief capped at KSh 30,000)">?</span>
+                        </label>
+                        <input type="number" id="pension_contribution" name="pension_contribution" min="0" step="0.01" placeholder="e.g., 15000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="insurance_premiums">
+                            Insurance Premiums (KSh)
+                            <span class="tooltip" data-tooltip="Life, health, or education insurance premiums (15% relief up to KSh 5,000)">?</span>
+                        </label>
+                        <input type="number" id="insurance_premiums" name="insurance_premiums" min="0" step="0.01" placeholder="e.g., 3000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical_fund_contribution">
+                            Medical Fund Contribution (KSh)
+                            <span class="tooltip" data-tooltip="Post-retirement medical fund (deductible up to KSh 15,000)">?</span>
+                        </label>
+                        <input type="number" id="medical_fund_contribution" name="medical_fund_contribution" min="0" step="0.01" placeholder="e.g., 8000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mortgage_interest">
+                            Mortgage Interest (KSh)
+                            <span class="tooltip" data-tooltip="Monthly mortgage interest for residential property (relief up to KSh 30,000)">?</span>
+                        </label>
+                        <input type="number" id="mortgage_interest" name="mortgage_interest" min="0" step="0.01" placeholder="e.g., 20000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="helb_deduction">
+                            HELB Deduction (KSh)
+                            <span class="tooltip" data-tooltip="Higher Education Loans Board monthly deduction">?</span>
+                        </label>
+                        <input type="number" id="helb_deduction" name="helb_deduction" min="0" step="0.01" placeholder="e.g., 2500">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="other_voluntary_deductions">
+                            Other Voluntary Deductions (KSh)
+                            <span class="tooltip" data-tooltip="Sacco, loans, savings, etc.">?</span>
+                        </label>
+                        <input type="number" id="other_voluntary_deductions" name="other_voluntary_deductions" min="0" step="0.01" placeholder="e.g., 5000">
+                    </div>
+
+                    <button type="submit" class="calculate-btn">🧮 Calculate Net Pay</button>
+                </form>
+
+                <div class="feature-list">
+                    <h4>✨ Calculation Features:</h4>
+                    <ul>
+                        <li>PAYE Tax (10% - 35% brackets)</li>
+                        <li>NSSF Contribution (6%)</li>
+                        <li>SHIF Contribution (2.75%)</li>
+                        <li>Affordable Housing Levy (1.5%)</li>
+                        <li>All KRA Tax Reliefs</li>
+                        <li>Personal Relief (KSh 2,400)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <h2 class="section-title">📊 Calculation Results</h2>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Calculating your net pay...</p>
+                </div>
+
+                <div id="error" class="error" style="display: none;"></div>
+
+                <div id="results" style="display: none;">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <div id="initial-message">
+                    <p style="text-align: center; color: #666; padding: 40px 20px;">
+                        Enter your salary details on the left to see your net pay calculation with all KRA-compliant deductions and reliefs.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Powered by Kenya Payroll System</strong> | 
+            Calculations based on current KRA rates | 
+            <a href="/contact/" style="color: #2E7D32;" target="_blank">Get the Full System</a></p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                <em>This calculator provides estimates. Consult a tax professional for specific advice.</em>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://127.0.0.1:8000';  // Change this to your actual domain
+        
+        // Form handling
+        document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await calculatePayroll();
+        });
+
+        // Real-time calculation on input change (with debounce)
+        let timeoutId;
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (document.getElementById('gross_salary').value) {
+                        calculatePayroll();
+                    }
+                }, 1000); // Wait 1 second after user stops typing
+            });
+        });
+
+        async function calculatePayroll() {
+            console.log('calculatePayroll started');
+            
+            const formData = new FormData(document.getElementById('calculatorForm'));
+            const data = {};
+            
+            // Convert form data to object
+            for (let [key, value] of formData.entries()) {
+                data[key] = value || 0;
+            }
+            
+            console.log('Form data:', data);
+
+            // Validate required field
+            if (!data.gross_salary || parseFloat(data.gross_salary) <= 0) {
+                console.error('Invalid salary:', data.gross_salary);
+                showError('Please enter a valid gross salary');
+                return;
+            }
+
+            // Show loading
+            console.log('Showing loading...');
+            showLoading();
+
+            try {
+                console.log('Making API request to:', `${API_BASE_URL}/api/public/calculator/`);
+                
+                const response = await fetch(`${API_BASE_URL}/api/public/calculator/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                console.log('API response status:', response.status);
+                console.log('API response ok:', response.ok);
+
+                const result = await response.json();
+                console.log('API response data:', result);
+
+                if (response.ok && result.success) {
+                    console.log('Calling displayResults...');
+                    displayResults(result);
+                } else {
+                    console.error('API error:', result.error);
+                    showError(result.error || 'Calculation failed');
+                }
+            } catch (error) {
+                console.error('Network/fetch error:', error);
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showError(`Cannot connect to server at ${API_BASE_URL}. Please ensure the Django server is running.`);
+                } else {
+                    showError('Network error. Please check your connection and try again.');
+                }
+                console.error('Calculator error:', error);
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('initial-message').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function displayResults(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('initial-message').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+
+            const resultsHtml = `
+                <div class="result-card">
+                    <h3>💰 Final Summary</h3>
+                    <div class="result-item">
+                        <span>Gross Salary:</span>
+                        <span class="amount">KSh ${formatNumber(data.summary.gross_salary)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Total Deductions:</span>
+                        <span class="amount">KSh ${formatNumber(data.summary.total_deductions)}</span>
+                    </div>
+                    <div class="result-item total">
+                        <span><strong>Net Pay:</strong></span>
+                        <span class="amount"><strong>KSh ${formatNumber(data.summary.net_pay)}</strong></span>
+                    </div>
+                    <div class="result-item">
+                        <span>Effective Tax Rate:</span>
+                        <span class="amount">${data.summary.effective_tax_rate.toFixed(2)}%</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3>🏛️ Statutory Deductions</h3>
+                    <div class="result-item">
+                        <span>PAYE Tax (after reliefs):</span>
+                        <span class="amount">KSh ${formatNumber(data.statutory_deductions.paye_tax.amount)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>NSSF (${data.statutory_deductions.nssf.rate}):</span>
+                        <span class="amount">KSh ${formatNumber(data.statutory_deductions.nssf.amount)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>SHIF (${data.statutory_deductions.shif.rate}):</span>
+                        <span class="amount">KSh ${formatNumber(data.statutory_deductions.shif.amount)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>AHL (${data.statutory_deductions.ahl.rate}):</span>
+                        <span class="amount">KSh ${formatNumber(data.statutory_deductions.ahl.amount)}</span>
+                    </div>
+                    ${data.statutory_deductions.helb.amount > 0 ? `
+                    <div class="result-item">
+                        <span>HELB:</span>
+                        <span class="amount">KSh ${formatNumber(data.statutory_deductions.helb.amount)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="result-card">
+                    <h3>🎯 Tax Reliefs Applied</h3>
+                    ${data.reliefs_applied.pension_relief.relief_amount > 0 ? `
+                    <div class="result-item">
+                        <span>Pension Relief:</span>
+                        <span class="amount">KSh ${formatNumber(data.reliefs_applied.pension_relief.relief_amount)}</span>
+                    </div>
+                    ` : ''}
+                    ${data.reliefs_applied.insurance_relief.relief_amount > 0 ? `
+                    <div class="result-item">
+                        <span>Insurance Relief (15%):</span>
+                        <span class="amount">KSh ${formatNumber(data.reliefs_applied.insurance_relief.relief_amount)}</span>
+                    </div>
+                    ` : ''}
+                    ${data.reliefs_applied.medical_fund_relief.relief_amount > 0 ? `
+                    <div class="result-item">
+                        <span>Medical Fund Relief:</span>
+                        <span class="amount">KSh ${formatNumber(data.reliefs_applied.medical_fund_relief.relief_amount)}</span>
+                    </div>
+                    ` : ''}
+                    ${data.reliefs_applied.mortgage_relief.relief_amount > 0 ? `
+                    <div class="result-item">
+                        <span>Mortgage Interest Relief:</span>
+                        <span class="amount">KSh ${formatNumber(data.reliefs_applied.mortgage_relief.relief_amount)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="result-item">
+                        <span>Personal Relief:</span>
+                        <span class="amount">KSh ${formatNumber(data.reliefs_applied.personal_relief.amount)}</span>
+                    </div>
+                </div>
+
+                <div class="success">
+                    ✅ Calculation completed successfully! All deductions and reliefs are KRA-compliant.
+                </div>
+            `;
+
+            document.getElementById('results').innerHTML = resultsHtml;
+        }
+
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('en-KE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Sample calculation on page load
+        window.addEventListener('load', function() {
+            // Set sample values
+            document.getElementById('gross_salary').value = '150000';
+            document.getElementById('pension_contribution').value = '15000';
+            document.getElementById('insurance_premiums').value = '3000';
+            
+            // Calculate with sample values
+            setTimeout(() => {
+                calculatePayroll();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
