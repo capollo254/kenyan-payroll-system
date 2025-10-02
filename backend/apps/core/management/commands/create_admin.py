@@ -9,30 +9,37 @@ class Command(BaseCommand):
         User = get_user_model()
         
         # Get credentials from environment or use defaults
-        username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@company.com')
-        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123456')
+        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'constantive@gmail.com')
+        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'September@2025.com')
+        first_name = os.environ.get('DJANGO_SUPERUSER_FIRST_NAME', 'Admin')
+        last_name = os.environ.get('DJANGO_SUPERUSER_LAST_NAME', 'User')
 
-        # Check if user with this email already exists (since we authenticate by email)
+        # Check if user with this email already exists
         if User.objects.filter(email=email).exists():
             self.stdout.write(
                 self.style.WARNING(f'User with email "{email}" already exists! Updating...')
             )
             user = User.objects.get(email=email)
             user.set_password(password)
-            user.username = username  # Update username too
+            user.first_name = first_name
+            user.last_name = last_name
             user.is_staff = True
             user.is_superuser = True
+            user.is_active = True
             user.save()
             self.stdout.write(
                 self.style.SUCCESS(f'User with email "{email}" updated successfully!')
             )
         else:
-            # Create new superuser
-            user = User.objects.create_superuser(
-                username=username,
+            # Create new superuser - NOTE: No username field in this User model
+            user = User.objects.create_user(
                 email=email,
-                password=password
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=True,
+                is_superuser=True,
+                is_active=True
             )
             self.stdout.write(
                 self.style.SUCCESS(f'Superuser created successfully!')
@@ -51,8 +58,10 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'🔑 PASSWORD: {password}')
         )
         self.stdout.write(
-            self.style.WARNING('📧 NOTE: Login using EMAIL address, not username!')
+            self.style.WARNING('📧 NOTE: Login using EMAIL address!')
         )
+        self.stdout.write(
+            self.style.WARNING('📧 This User model does NOT have username field!'))
         self.stdout.write(
             self.style.SUCCESS('🌐 Admin URL: /admin/')
         )

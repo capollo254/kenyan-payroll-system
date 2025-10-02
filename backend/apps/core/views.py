@@ -1760,7 +1760,8 @@ def debug_user_check(request):
             'staff_users': User.objects.filter(is_staff=True).count(),
             'email_check': None,
             'all_emails': list(User.objects.values_list('email', flat=True)),
-            'all_usernames': list(User.objects.values_list('username', flat=True)),
+            'user_model_fields': [f.name for f in User._meta.get_fields()],
+            'note': 'This User model uses EMAIL as primary identifier, not username'
         }
         
         # Check specific user
@@ -1768,8 +1769,9 @@ def debug_user_check(request):
             user = User.objects.get(email=email)
             debug_info['email_check'] = {
                 'exists': True,
-                'username': user.username,
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
                 'is_superuser': user.is_superuser,
                 'is_staff': user.is_staff,
                 'is_active': user.is_active,
