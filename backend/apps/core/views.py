@@ -1022,7 +1022,7 @@ def user_login_view(request):
             <h1>🔐 Staff Login</h1>
             
             <div class="messages">
-                {"".join([f'<div class="message {tag}">{message}</div>' for tag, message in messages.get_messages(request)])}
+                {"".join([f'<div class="message {msg.tags}">{msg.message}</div>' for msg in messages.get_messages(request)])}
             </div>
             
             <form method="post">
