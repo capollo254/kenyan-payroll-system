@@ -136,14 +136,14 @@ elif os.environ.get('RAILWAY_ENVIRONMENT'):
 else:
     # Development database (local PostgreSQL or SQLite fallback)
     try:
-        # Try PostgreSQL first
+        # Try PostgreSQL first updated by Apollo Constantive
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'kenyan_payroll_system_db',
+                'NAME': 'railway',
                 'USER': 'postgres',
-                'PASSWORD': 'September@2025',
-                'HOST': 'localhost',
+                'PASSWORD': 'HNrIbRUjdgVOHoczfwCtkSSHVETKMyjG',
+                'HOST': 'postgres.railway.internal',
                 'PORT': '5432',
             }
         }
