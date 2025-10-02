@@ -16,8 +16,10 @@ python-decouple==3.8
 # CORS headers for handling cross-origin requests from the frontend
 django-cors-headers==4.9.0
 
-# Database connector for PostgreSQL
-psycopg2-binary==2.9.7
+# Database connectors
+psycopg2-binary==2.9.7  # PostgreSQL (existing)
+django-mssql-backend>=2.8.1  # Microsoft SQL Server support
+pyodbc>=4.0.30  # ODBC driver for MSSQL
 
 # Asynchronous task queue for handling background processes
 # We'll include the Redis transport dependency here.
@@ -28,6 +30,12 @@ redis==5.0.1
 
 # Gunicorn is a popular WSGI HTTP Server for UNIX, used for production deployments
 gunicorn==22.0.0
+
+# PDF generation for P9 tax reports
+reportlab==4.0.4
+
+# Excel file generation for bulk reports
+openpyxl==3.1.2
 
 # Production deployment dependencies
 # WhiteNoise for serving static files in production
