@@ -200,7 +200,7 @@ def render_public_landing(request):
             <div class="section" style="text-align: center;">
                 <h2>👥 For Organizations & Employees</h2>
                 <p><strong>Primary Access:</strong> Use our main employee portal for full payroll system access</p>
-                <a href="http://localhost:3000/login" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
+                <a href="/login/" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
                     🌟 Employee Portal Login
                 </a>
                 <p style="margin: 20px 0; color: #7f8c8d;"><em>Access payslips, profile, leave requests, and admin features</em></p>
@@ -276,7 +276,7 @@ def render_internal_dashboard(request):
                 </div>
                 <p style="text-align: center; margin-top: 20px;">
                     <em>For the best experience, use our main employee portal: 
-                    <a href="http://localhost:3000/login" style="color: #27ae60;" target="_blank">Employee Portal</a>
+                    <a href="/login/" style="color: #27ae60;" target="_blank">Employee Portal</a>
                     </em>
                 </p>
             </div>'''
@@ -1045,7 +1045,7 @@ def user_login_view(request):
             
             <div class="help-text">
                 <p><strong>⚠️ STAFF ACCESS ONLY:</strong> This login is restricted to staff members only.</p>
-                <p><strong>For Employees:</strong> <a href="http://localhost:3000/login" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
+                <p><strong>For Employees:</strong> <a href="/login/" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
                 <p><strong>For Admin Access:</strong> <a href="/admin/" style="color: #3498db;" target="_blank">Use Django Admin</a></p>
                 <p>Regular employees should use the main portal for full system access.</p>
             </div>
