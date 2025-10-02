@@ -208,7 +208,7 @@ def render_public_landing(request):
                 <hr style="margin: 30px 0; border: 1px solid #ecf0f1;">
                 
                 <p><strong>Alternative Access:</strong> System administrators and API access</p>
-                <a href="/employee-portal/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
+                <a href="/login/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
                 <a href="/admin/" class="button" style="background: #e74c3c; margin: 5px;" target="_blank">Django Admin</a>
             </div>
             
