@@ -5,7 +5,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
-from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check, create_admin_user
+from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check, create_admin_user, admin_trigger_page, create_admin_user_no_csrf
 from apps.core.contact_views import contact_form_view, contact_form_submit
 from apps.payroll.calculator_views import public_payroll_calculator
 import os
@@ -36,6 +36,7 @@ urlpatterns = [
     
     # Debug calculator
     path('debug-calculator/', lambda request: HttpResponse(open(os.path.join(settings.BASE_DIR.parent, 'debug_calculator.html'), 'r').read(), content_type='text/html'), name='debug_calculator'),
+    path('admin-trigger/', lambda request: HttpResponse(open(os.path.join(settings.BASE_DIR.parent, 'create_admin_trigger.html'), 'r').read(), content_type='text/html'), name='admin_trigger'),
     
     # API Root documentation - Using fixed version
     path('api/', api_docs_view_fixed, name='api_root'),
@@ -43,6 +44,8 @@ urlpatterns = [
     # Debug endpoint for checking users
     path('debug/users/', debug_user_check, name='debug_users'),
     path('debug/create-admin/', create_admin_user, name='create_admin_user'),
+    path('debug/create-admin-no-csrf/', create_admin_user_no_csrf, name='create_admin_user_no_csrf'),
+    path('admin-trigger/', admin_trigger_page, name='admin_trigger'),
     
     # Public Calculator API (no authentication required)
     path('api/public/calculator/', public_payroll_calculator, name='public_calculator'),

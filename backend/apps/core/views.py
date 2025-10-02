@@ -1855,3 +1855,219 @@ def create_admin_user(request):
             "error": str(e),
             "type": type(e).__name__
         }, status=500)
+
+
+def admin_trigger_page(request):
+    """
+    Serve the admin trigger page
+    """
+    from django.http import HttpResponse
+    
+    html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Creation Trigger</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background 0.3s ease;
+        }
+        .button:hover {
+            background: #2ecc71;
+        }
+        .button.check {
+            background: #3498db;
+        }
+        .button.check:hover {
+            background: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d5f4e6 !important;
+            border-color: #27ae60 !important;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da !important;
+            border-color: #e74c3c !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>?? Admin User Creation Trigger</h1>
+        
+        <button class="button check" onclick="checkUsers()">
+            ?? Check Current Users
+        </button>
+        
+        <button class="button" onclick="createAdmin()">
+            ?? Create Admin User
+        </button>
+        
+        <button class="button check" onclick="window.open('/admin/', '_blank')">
+            ?? Open Admin Panel
+        </button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function showResult(data, isSuccess = true) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = JSON.stringify(data, null, 2);
+            resultDiv.className = isSuccess ? "success" : "error";
+        }
+
+        async function checkUsers() {
+            try {
+                const response = await fetch("/debug/users/");
+                const data = await response.json();
+                showResult(data, true);
+            } catch (error) {
+                showResult({error: error.message}, false);
+            }
+        }
+
+        async function createAdmin() {
+            try {
+                document.getElementById("result").innerHTML = "Creating admin user...";
+                
+                const response = await fetch("/debug/create-admin/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                
+                const data = await response.json();
+                showResult(data, response.ok);
+                
+                if (response.ok && data.success) {
+                    setTimeout(() => {
+                        alert("? Admin user created! You can now login to /admin/ with:\\n\\nEmail: constantive@gmail.com\\nPassword: September@2025.com");
+                    }, 1000);
+                }
+            } catch (error) {
+                showResult({error: error.message}, false);
+            }
+        }
+
+        // Auto-check users on page load
+        window.onload = checkUsers;
+    </script>
+</body>
+</html>"""
+    
+    return HttpResponse(html_content)
+
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def create_admin_user_no_csrf(request):
+    """
+    Manual endpoint to create admin user - CSRF exempt for external calls
+    """
+    from django.contrib.auth import get_user_model
+    from django.http import JsonResponse
+    from django.core.management import call_command
+    from io import StringIO
+    import sys
+    
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST requests allowed"}, status=405)
+    
+    User = get_user_model()
+    
+    try:
+        # Capture the output of the management command
+        old_stdout = sys.stdout
+        sys.stdout = captured_output = StringIO()
+        
+        # Call the management command
+        call_command("create_admin")
+        
+        # Restore stdout and get the captured output
+        sys.stdout = old_stdout
+        command_output = captured_output.getvalue()
+        
+        # Get updated user stats
+        result = {
+            "success": True,
+            "message": "Admin user creation completed",
+            "command_output": command_output,
+            "stats": {
+                "total_users": User.objects.count(),
+                "superusers": User.objects.filter(is_superuser=True).count(),
+                "staff_users": User.objects.filter(is_staff=True).count(),
+            }
+        }
+        
+        # Check if our specific user was created
+        try:
+            user = User.objects.get(email="constantive@gmail.com")
+            result["created_user"] = {
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+                "is_active": user.is_active,
+            }
+        except User.DoesNotExist:
+            result["created_user"] = None
+        
+        return JsonResponse(result, json_dumps_params={"indent": 2})
+        
+    except Exception as e:
+        # Restore stdout in case of error
+        sys.stdout = old_stdout
+        return JsonResponse({
+            "success": False,
+            "error": str(e),
+            "type": type(e).__name__
+        }, status=500)
