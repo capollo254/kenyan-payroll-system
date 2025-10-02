@@ -1791,3 +1791,67 @@ def debug_user_check(request):
             'error': str(e),
             'type': type(e).__name__
         }, status=500)
+
+def create_admin_user(request):
+    """
+    Manual endpoint to create admin user - for debugging deployment issues
+    """
+    from django.contrib.auth import get_user_model
+    from django.http import JsonResponse
+    from django.core.management import call_command
+    from io import StringIO
+    import sys
+    
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST requests allowed"}, status=405)
+    
+    User = get_user_model()
+    
+    try:
+        # Capture the output of the management command
+        old_stdout = sys.stdout
+        sys.stdout = captured_output = StringIO()
+        
+        # Call the management command
+        call_command("create_admin")
+        
+        # Restore stdout and get the captured output
+        sys.stdout = old_stdout
+        command_output = captured_output.getvalue()
+        
+        # Get updated user stats
+        result = {
+            "success": True,
+            "message": "Admin user creation completed",
+            "command_output": command_output,
+            "stats": {
+                "total_users": User.objects.count(),
+                "superusers": User.objects.filter(is_superuser=True).count(),
+                "staff_users": User.objects.filter(is_staff=True).count(),
+            }
+        }
+        
+        # Check if our specific user was created
+        try:
+            user = User.objects.get(email="constantive@gmail.com")
+            result["created_user"] = {
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+                "is_active": user.is_active,
+            }
+        except User.DoesNotExist:
+            result["created_user"] = None
+        
+        return JsonResponse(result, json_dumps_params={"indent": 2})
+        
+    except Exception as e:
+        # Restore stdout in case of error
+        sys.stdout = old_stdout
+        return JsonResponse({
+            "success": False,
+            "error": str(e),
+            "type": type(e).__name__
+        }, status=500)
