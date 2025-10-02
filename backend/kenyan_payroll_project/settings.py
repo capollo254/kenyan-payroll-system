@@ -109,9 +109,21 @@ WSGI_APPLICATION = 'kenyan_payroll_project.wsgi.application'
 # Database
 # Use PostgreSQL from Railway in production, or local database in development
 if 'DATABASE_URL' in os.environ:
-    # Production database (Railway PostgreSQL)
+    # Production database (Railway PostgreSQL with DATABASE_URL)
     DATABASES = {
         'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    }
+elif os.environ.get('RAILWAY_ENVIRONMENT') and os.environ.get('DB_ENGINE'):
+    # Railway production environment with manual DB config
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
+            'NAME': os.environ.get('DB_NAME', 'railway'),
+            'USER': os.environ.get('DB_USER', 'postgres'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
     }
 elif os.environ.get('RAILWAY_ENVIRONMENT'):
     # Railway build environment - use SQLite temporarily
