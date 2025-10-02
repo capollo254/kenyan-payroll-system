@@ -5,7 +5,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
-from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed
+from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check
 from apps.core.contact_views import contact_form_view, contact_form_submit
 from apps.payroll.calculator_views import public_payroll_calculator
 import os
@@ -39,6 +39,9 @@ urlpatterns = [
     
     # API Root documentation - Using fixed version
     path('api/', api_docs_view_fixed, name='api_root'),
+    
+    # Debug endpoint for checking users
+    path('debug/users/', debug_user_check, name='debug_users'),
     
     # Public Calculator API (no authentication required)
     path('api/public/calculator/', public_payroll_calculator, name='public_calculator'),

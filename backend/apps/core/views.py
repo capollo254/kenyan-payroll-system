@@ -1739,3 +1739,53 @@ def refresh_token_activity(request):
             'success': False,
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+def debug_user_check(request):
+    """
+    Diagnostic endpoint to check if users exist and their status
+    """
+    from django.contrib.auth import get_user_model
+    from django.http import JsonResponse
+    
+    User = get_user_model()
+    
+    try:
+        # Check for specific email
+        email = 'constantive@gmail.com'
+        
+        debug_info = {
+            'total_users': User.objects.count(),
+            'superusers': User.objects.filter(is_superuser=True).count(),
+            'staff_users': User.objects.filter(is_staff=True).count(),
+            'email_check': None,
+            'all_emails': list(User.objects.values_list('email', flat=True)),
+            'all_usernames': list(User.objects.values_list('username', flat=True)),
+        }
+        
+        # Check specific user
+        try:
+            user = User.objects.get(email=email)
+            debug_info['email_check'] = {
+                'exists': True,
+                'username': user.username,
+                'email': user.email,
+                'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'is_active': user.is_active,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+            }
+        except User.DoesNotExist:
+            debug_info['email_check'] = {
+                'exists': False,
+                'message': f'User with email {email} does not exist'
+            }
+        
+        return JsonResponse(debug_info, json_dumps_params={'indent': 2})
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': str(e),
+            'type': type(e).__name__
+        }, status=500)
