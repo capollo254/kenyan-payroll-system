@@ -2071,3 +2071,74 @@ def create_admin_user_no_csrf(request):
             "error": str(e),
             "type": type(e).__name__
         }, status=500)
+
+
+# SECURITY: Disable dangerous debug endpoints in production
+from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test
+
+def is_superuser_and_debug(user):
+    """Only allow superusers in debug mode"""
+    return user.is_authenticated and user.is_superuser and settings.DEBUG
+
+@user_passes_test(is_superuser_and_debug)
+def debug_user_check_secure(request):
+    """
+    SECURED: Diagnostic endpoint - requires superuser + debug mode
+    """
+    # Only accessible if DEBUG=True and user is superuser
+    from django.contrib.auth import get_user_model
+    from django.http import JsonResponse
+    
+    User = get_user_model()
+    
+    try:
+        # Check for specific email
+        email = "constantive@gmail.com"
+        
+        debug_info = {
+            "total_users": User.objects.count(),
+            "superusers": User.objects.filter(is_superuser=True).count(),
+            "staff_users": User.objects.filter(is_staff=True).count(),
+            "email_check": None,
+            "warning": "This endpoint is only available in DEBUG mode to superusers",
+            "note": "This User model uses EMAIL as primary identifier, not username"
+        }
+        
+        # Check specific user
+        try:
+            user = User.objects.get(email=email)
+            debug_info["email_check"] = {
+                "exists": True,
+                "email": user.email,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+                "is_active": user.is_active,
+            }
+        except User.DoesNotExist:
+            debug_info["email_check"] = {
+                "exists": False,
+                "message": f"User with email {email} does not exist"
+            }
+        
+        return JsonResponse(debug_info, json_dumps_params={"indent": 2})
+        
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e),
+            "type": type(e).__name__
+        }, status=500)
+
+
+def create_admin_disabled(request):
+    """
+    SECURITY: Admin creation endpoints disabled in production
+    """
+    from django.http import JsonResponse
+    
+    return JsonResponse({
+        "error": "SECURITY: Admin creation endpoints have been disabled for security reasons",
+        "message": "Admin users should be created through Django management commands on the server",
+        "contact": "Contact system administrator for admin account creation",
+        "timestamp": "2025-10-02T17:40:00Z"
+    }, status=403)
