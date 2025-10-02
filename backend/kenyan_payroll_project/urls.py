@@ -22,7 +22,8 @@ urlpatterns = [
     
     # Authentication
     path('logout/', user_logout_view, name='logout'),
-    path('login/', user_login_view, name='login'),
+    path('login/', user_login_view, name='login'),  # Keep old URL for compatibility
+    path('admin-staff/', user_login_view, name='admin_staff_login'),  # New staff login URL
     
     # Payslips - Using fixed version
     path('my-payslips/', payslips_view_fixed, name='my_payslips'),
@@ -49,7 +50,8 @@ urlpatterns = [
     
     # React Frontend
     path('frontend/', react_frontend_fixed, name='react_frontend_fixed'),
-    path('employee-portal/', react_frontend_fixed, name='employee_portal'),
+    path('employee-portal/', react_frontend_fixed, name='employee_portal'),  # Keep old URL for compatibility
+    path('employee/', react_frontend_fixed, name='employee_login'),  # New employee portal URL
     
     # Public Calculator API (no authentication required)
     path('api/public/calculator/', public_payroll_calculator, name='public_calculator'),

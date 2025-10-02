@@ -200,7 +200,7 @@ def render_public_landing(request):
             <div class="section" style="text-align: center;">
                 <h2>👥 For Organizations & Employees</h2>
                 <p><strong>Primary Access:</strong> Use our main employee portal for full payroll system access</p>
-                <a href="/employee-portal/" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
+                <a href="/employee/" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
                     🌟 Employee Portal Login
                 </a>
                 <p style="margin: 20px 0; color: #7f8c8d;"><em>Access payslips, profile, leave requests, and admin features</em></p>
@@ -208,7 +208,7 @@ def render_public_landing(request):
                 <hr style="margin: 30px 0; border: 1px solid #ecf0f1;">
                 
                 <p><strong>Alternative Access:</strong> System administrators and API access</p>
-                <a href="/login/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
+                <a href="/admin-staff/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
                 <a href="/admin/" class="button" style="background: #e74c3c; margin: 5px;" target="_blank">Django Admin</a>
             </div>
             
@@ -276,7 +276,7 @@ def render_internal_dashboard(request):
                 </div>
                 <p style="text-align: center; margin-top: 20px;">
                     <em>For the best experience, use our main employee portal: 
-                    <a href="/employee-portal/" style="color: #27ae60;" target="_blank">Employee Portal</a>
+                    <a href="/employee/" style="color: #27ae60;" target="_blank">Employee Portal</a>
                     </em>
                 </p>
             </div>'''
@@ -1045,7 +1045,7 @@ def user_login_view(request):
             
             <div class="help-text">
                 <p><strong>⚠️ STAFF ACCESS ONLY:</strong> This login is restricted to staff members only.</p>
-                <p><strong>For Employees:</strong> <a href="/employee-portal/" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
+                <p><strong>For Employees:</strong> <a href="/employee/" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
                 <p><strong>For Admin Access:</strong> <a href="/admin/" style="color: #3498db;" target="_blank">Use Django Admin</a></p>
                 <p>Regular employees should use the main portal for full system access.</p>
             </div>
@@ -1284,7 +1284,7 @@ def api_docs_view_fixed(request):
 
                 <div class="nav-links">
                     <a href="/calculator/">Try Calculator</a>
-                    <a href="/employee-portal/">Login</a>
+                    <a href="/employee/">Login</a>
                     <a href="/">Home</a>
                 </div>
             </div>
