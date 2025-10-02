@@ -379,8 +379,12 @@
     </div>
 
     <script>
-        // Configuration
-        const API_BASE_URL = 'http://127.0.0.1:8000';  // Change this to your actual domain
+        // Configuration - Auto-detect environment
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE_URL = isLocalhost ? 'http://127.0.0.1:8000' : 'https://web-production-85d2b.up.railway.app';
+        
+        console.log('Environment detected:', isLocalhost ? 'Development (localhost)' : 'Production');
+        console.log('API Base URL:', API_BASE_URL);
         
         // Form handling
         document.getElementById('calculatorForm').addEventListener('submit', async function(e) {

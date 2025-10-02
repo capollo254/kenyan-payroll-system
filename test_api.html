@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Leave Management API Test</h1>
+    
+    <div>
+        <h2>Test Results:</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://web-production-85d2b.up.railway.app/api/v1/';
+        
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing APIs...</p>';
+            
+            try {
+                // Test leave types endpoint (no auth required for basic check)
+                console.log('Testing leave types...');
+                const response = await fetch(`${API_URL}leaves/leave-types/`);
+                
+                results.innerHTML += `<h3>Leave Types API Test</h3>`;
+                results.innerHTML += `<p><strong>Status:</strong> ${response.status}</p>`;
+                results.innerHTML += `<p><strong>Status Text:</strong> ${response.statusText}</p>`;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML += `<p><strong>Data:</strong></p>`;
+                    results.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    const errorText = await response.text();
+                    results.innerHTML += `<p><strong>Error:</strong> ${errorText}</p>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p><strong>Network Error:</strong> ${error.message}</p>`;
+                console.error('API test error:', error);
+            }
+        }
+        
+        // Run test when page loads
+        window.onload = testAPI;
+    </script>
+</body>
+</html>
