@@ -1,11 +1,11 @@
 # kenyan_payroll_project/urls.py
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
-from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check_secure, create_admin_disabled
+from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check_secure, create_admin_disabled, react_frontend_fixed
 from apps.core.contact_views import contact_form_view, contact_form_submit
 from apps.payroll.calculator_views import public_payroll_calculator
 import os
@@ -47,6 +47,10 @@ urlpatterns = [
     path('debug/create-admin-no-csrf/', create_admin_disabled, name='create_admin_disabled_no_csrf'),
     path('admin-trigger/', create_admin_disabled, name='admin_trigger_disabled'),
     
+    # React Frontend
+    path('frontend/', react_frontend_fixed, name='react_frontend_fixed'),
+    path('employee-portal/', react_frontend_fixed, name='employee_portal'),
+    
     # Public Calculator API (no authentication required)
     path('api/public/calculator/', public_payroll_calculator, name='public_calculator'),
     
@@ -62,3 +66,15 @@ urlpatterns = [
 # Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Add at the end of urls.py before the media files section
+
+# Serve React static files
+if settings.DEBUG or True:  # Allow in production for React frontend
+    from django.views.static import serve
+    import re
+    
+    urlpatterns += [
+        re_path(r'^frontend-static/(?P<path>.*)$', serve, {
+            'document_root': os.path.join(settings.BASE_DIR.parent, 'frontend_build', 'static'),
+        }),
+    ]
