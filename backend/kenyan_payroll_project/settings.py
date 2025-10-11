@@ -134,27 +134,13 @@ elif os.environ.get('RAILWAY_ENVIRONMENT'):
         }
     }
 else:
-    # Development database (local PostgreSQL or SQLite fallback)
-    try:
-        # Try PostgreSQL first updated by Apollo Constantive
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'railway',
-                'USER': 'postgres',
-                'PASSWORD': 'HNrIbRUjdgVOHoczfwCtkSSHVETKMyjG',
-                'HOST': 'postgres.railway.internal',
-                'PORT': '5432',
-            }
+    # Development database - Use SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
-    except Exception:
-        # Fallback to SQLite if PostgreSQL is not available
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

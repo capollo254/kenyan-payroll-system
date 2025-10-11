@@ -2175,412 +2175,66 @@ def react_frontend(request):
 
 def react_frontend_fixed(request):
     """
-    Serve a responsive Employee Portal frontend
+    Serve the React frontend application with proper static file URLs
     """
     from django.http import HttpResponse
-    from django.middleware.csrf import get_token
-    
-    # Create a fully responsive Employee Portal
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Employee Portal - Kenya Payroll System</title>
-        <style>
-            /* Reset and base styles */
-            * {{ 
-                margin: 0; 
-                padding: 0; 
-                box-sizing: border-box; 
-            }}
-            
-            body {{ 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                line-height: 1.6;
-            }}
-            
-            .container {{
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                text-align: center;
-                width: 100%;
-                max-width: 500px;
-                animation: slideUp 0.6s ease-out;
-            }}
-            
-            @keyframes slideUp {{
-                from {{
-                    opacity: 0;
-                    transform: translateY(30px);
-                }}
-                to {{
-                    opacity: 1;
-                    transform: translateY(0);
-                }}
-            }}
-            
-            .logo {{
-                width: 80px;
-                height: 80px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border-radius: 50%;
-                margin: 0 auto 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5em;
-                color: white;
-            }}
-            
-            h1 {{ 
-                color: #333; 
-                margin-bottom: 10px; 
-                font-size: 2.2em;
-                font-weight: 700;
-            }}
-            
-            .subtitle {{ 
-                color: #666; 
-                margin-bottom: 30px; 
-                font-size: 1.1em;
-                font-weight: 300;
-            }}
+    from django.conf import settings
+    import os
 
-            .login-form {{ 
-                margin-top: 30px; 
-            }}
-            
-            .form-group {{ 
-                margin-bottom: 20px; 
-                text-align: left; 
-            }}
-            
-            label {{ 
-                display: block; 
-                margin-bottom: 8px; 
-                color: #333; 
-                font-weight: 500;
-                font-size: 0.95em;
-            }}
-            
-            input[type="email"], input[type="password"] {{
-                width: 100%;
-                padding: 16px;
-                border: 2px solid #e1e5e9;
-                border-radius: 12px;
-                font-size: 16px;
-                transition: all 0.3s ease;
-                background: #fafafa;
-            }}
-            
-            input[type="email"]:focus, input[type="password"]:focus {{
-                outline: none;
-                border-color: #667eea;
-                background: white;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }}
-            
-            .login-btn {{
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 16px 30px;
-                border: none;
-                border-radius: 12px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                width: 100%;
-                transition: all 0.3s ease;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }}
-            
-            .login-btn:hover {{ 
-                transform: translateY(-2px); 
-                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            }}
-            
-            .login-btn:active {{
-                transform: translateY(0);
-            }}
-            
-            .links {{ 
-                margin-top: 25px; 
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }}
-            
-            .links a {{ 
-                color: #667eea; 
-                text-decoration: none; 
-                font-weight: 500;
-                font-size: 0.9em;
-                transition: color 0.3s ease;
-            }}
-            
-            .links a:hover {{ 
-                color: #764ba2;
-                text-decoration: underline; 
-            }}
-            
-            .features {{
-                margin-top: 30px;
-                text-align: left;
-            }}
-            
-            .features h3 {{
-                color: #333;
-                margin-bottom: 15px;
-                font-size: 1.1em;
-                text-align: center;
-            }}
-            
-            .feature-list {{
-                list-style: none;
-                padding: 0;
-            }}
-            
-            .feature-list li {{
-                padding: 8px 0;
-                color: #666;
-                font-size: 0.9em;
-                display: flex;
-                align-items: center;
-            }}
-            
-            .feature-list li:before {{
-                content: "✓";
-                color: #27ae60;
-                font-weight: bold;
-                margin-right: 10px;
-                width: 20px;
-            }}
-            
-            /* Mobile Responsiveness */
-            @media (max-width: 768px) {{
-                body {{
-                    padding: 15px;
-                }}
-                
-                .container {{
-                    padding: 30px 25px;
-                    border-radius: 15px;
-                }}
-                
-                h1 {{
-                    font-size: 1.8em;
-                }}
-                
-                .subtitle {{
-                    font-size: 1em;
-                }}
-                
-                input[type="email"], input[type="password"] {{
-                    padding: 14px;
-                    font-size: 16px; /* Prevents zoom on iOS */
-                }}
-                
-                .login-btn {{
-                    padding: 14px 25px;
-                    font-size: 15px;
-                }}
-                
-                .links {{
-                    flex-direction: column;
-                    gap: 15px;
-                }}
-            }}
-            
-            /* Small Mobile */
-            @media (max-width: 480px) {{
-                .container {{
-                    padding: 25px 20px;
-                }}
-                
-                .logo {{
-                    width: 60px;
-                    height: 60px;
-                    font-size: 2em;
-                }}
-                
-                h1 {{
-                    font-size: 1.6em;
-                }}
-                
-                .features {{
-                    margin-top: 20px;
-                }}
-            }}
-            
-            /* Large screens */
-            @media (min-width: 1200px) {{
-                .container {{
-                    max-width: 600px;
-                    padding: 50px;
-                }}
-                
-                h1 {{
-                    font-size: 2.5em;
-                }}
-            }}
-            
-            /* Dark mode support */
-            @media (prefers-color-scheme: dark) {{
-                .container {{
-                    background: #1a1a1a;
-                    color: #e0e0e0;
-                }}
-                
-                h1, .features h3 {{
-                    color: #ffffff;
-                }}
-                
-                .subtitle {{
-                    color: #b0b0b0;
-                }}
-                
-                label {{
-                    color: #e0e0e0;
-                }}
-                
-                input[type="email"], input[type="password"] {{
-                    background: #2a2a2a;
-                    border-color: #444;
-                    color: #e0e0e0;
-                }}
-                
-                input[type="email"]:focus, input[type="password"]:focus {{
-                    background: #333;
-                    border-color: #667eea;
-                }}
-                
-                .feature-list li {{
-                    color: #b0b0b0;
-                }}
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="logo">🏢</div>
-            <h1>Employee Portal</h1>
-            <p class="subtitle">Kenya Payroll System</p>
-
-            <div class="login-form">
-                <form method="post" action="/api/v1/auth/login/" id="loginForm">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">
-
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required 
-                               placeholder="your.email@company.com"
-                               autocomplete="email">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required 
-                               placeholder="Enter your password"
-                               autocomplete="current-password">
-                    </div>
-
-                    <button type="submit" class="login-btn">
-                        🔐 Login to Portal
-                    </button>
-                </form>
+    try:
+        # Path to the React build index.html
+        frontend_path = os.path.join(settings.BASE_DIR.parent, 'frontend_build', 'index.html')
+        
+        with open(frontend_path, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        # Fix static file URLs to work with Django
+        html_content = html_content.replace('/static/', '/frontend-static/')
+        
+        return HttpResponse(html_content, content_type='text/html')
+    except FileNotFoundError:
+        return HttpResponse("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Frontend Not Available</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 50px; }
+                .container { max-width: 600px; margin: 0 auto; text-align: center; }
+                .button { display: inline-block; padding: 10px 20px; background: #007cba; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🚧 React Frontend Loading...</h1>
+                <p>The React frontend is being prepared. Please try again in a moment.</p>
+                <a href="/" class="button">Return to Main Site</a>
+                <a href="/login/" class="button">Django Login</a>
             </div>
+        </body>
+        </html>
+        """, content_type='text/html')
 
-            <div class="features">
-                <h3>Access Your:</h3>
-                <ul class="feature-list">
-                    <li>Monthly Payslips & P9 Forms</li>
-                    <li>Leave Requests & Balances</li>
-                    <li>Employee Profile & Documents</li>
-                    <li>Overtime & Allowances</li>
-                    <li>Tax Calculations & Reports</li>
-                </ul>
+    except FileNotFoundError:
+        return HttpResponse("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Frontend Not Available</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 50px; }
+                .container { max-width: 600px; margin: 0 auto; text-align: center; }
+                .button { display: inline-block; padding: 10px 20px; background: #007cba; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🚧 React Frontend Loading...</h1>
+                <p>The React frontend is being prepared. Please try again in a moment.</p>
+                <a href="/" class="button">Return to Main Site</a>
+                <a href="/login/" class="button">Django Login</a>
             </div>
+        </body>
+        </html>
+        """, content_type='text/html')
 
-            <div class="links">
-                <a href="/">← Back to Home</a>
-                <a href="/admin-staff/">Staff Login</a>
-            </div>
-        </div>
-
-        <script>
-            // Enhanced form handling with loading states
-            document.addEventListener('DOMContentLoaded', function() {{
-                const form = document.getElementById('loginForm');
-                const submitBtn = form.querySelector('.login-btn');
-                const originalBtnText = submitBtn.textContent;
-                
-                form.addEventListener('submit', function(e) {{
-                    // Show loading state
-                    submitBtn.textContent = '🔄 Logging in...';
-                    submitBtn.style.opacity = '0.7';
-                    submitBtn.disabled = true;
-                    
-                    // Re-enable after timeout to prevent permanent disable
-                    setTimeout(() => {{
-                        submitBtn.textContent = originalBtnText;
-                        submitBtn.style.opacity = '1';
-                        submitBtn.disabled = false;
-                    }}, 5000);
-                }});
-                
-                // Auto-focus email field on desktop
-                if (window.innerWidth > 768) {{
-                    document.getElementById('email').focus();
-                }}
-                
-                // Add visual feedback for form validation
-                const inputs = form.querySelectorAll('input[required]');
-                inputs.forEach(input => {{
-                    input.addEventListener('invalid', function() {{
-                        this.style.borderColor = '#e74c3c';
-                        this.style.backgroundColor = '#ffebee';
-                    }});
-                    
-                    input.addEventListener('input', function() {{
-                        if (this.validity.valid) {{
-                            this.style.borderColor = '#27ae60';
-                            this.style.backgroundColor = '#e8f5e8';
-                        }} else {{
-                            this.style.borderColor = '#e1e5e9';
-                            this.style.backgroundColor = '#fafafa';
-                        }}
-                    }});
-                }});
-            }});
-            
-            // Add responsive behavior
-            function updateLayout() {{
-                const container = document.querySelector('.container');
-                if (window.innerHeight < 600) {{
-                    container.style.margin = '10px auto';
-                }}
-            }}
-            
-            window.addEventListener('resize', updateLayout);
-            updateLayout();
-            
-            console.log('🏢 Employee Portal Loaded');
-            console.log('📱 Responsive design active');
-            console.log('🎨 Device width:', window.innerWidth + 'px');
-        </script>
-    </body>
-    </html>
-    """
-    
-    return HttpResponse(html_content, content_type='text/html')
