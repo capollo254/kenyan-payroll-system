@@ -2135,10 +2135,130 @@ def create_admin_disabled(request):
     SECURITY: Admin creation endpoints disabled in production
     """
     from django.http import JsonResponse
-    
+
     return JsonResponse({
         "error": "SECURITY: Admin creation endpoints have been disabled for security reasons",
         "message": "Admin users should be created through Django management commands on the server",
         "contact": "Contact system administrator for admin account creation",
         "timestamp": "2025-10-02T17:40:00Z"
     }, status=403)
+
+
+# ===================================================================
+# REACT FRONTEND VIEWS - SaaS Multi-Tenant Setup
+# ===================================================================
+
+def serve_react_frontend(request):
+    """
+    Serve the React frontend application for multi-tenant SaaS
+    This handles all React routes and serves the index.html file
+    """
+    from django.http import HttpResponse, Http404
+    import os
+    
+    try:
+        # Get the path to the frontend build directory
+        frontend_build_path = os.path.join(settings.BASE_DIR.parent, 'frontend_build')
+        index_path = os.path.join(frontend_build_path, 'index.html')
+        
+        if os.path.exists(index_path):
+            with open(index_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            # Add tenant information to the HTML if available
+            tenant_info = getattr(request, 'tenant', None)
+            if tenant_info:
+                # Inject tenant data into the HTML
+                tenant_script = f"""
+                <script>
+                    window.TENANT_INFO = {{
+                        'id': '{tenant_info.get("id", "")}',
+                        'name': '{tenant_info.get("name", "")}',
+                        'subdomain': '{tenant_info.get("subdomain", "")}'
+                    }};
+                </script>
+                """
+                html_content = html_content.replace('</head>', f'{tenant_script}</head>')
+            
+            return HttpResponse(html_content, content_type='text/html')
+        else:
+            raise Http404("React frontend not found. Please build the frontend first.")
+            
+    except Exception as e:
+        return HttpResponse(
+            f"<h1>Frontend Error</h1><p>Error loading React frontend: {str(e)}</p>",
+            status=500
+        )
+
+
+def serve_react_static(request, path):
+    """
+    Serve static files for the React frontend (CSS, JS, etc.)
+    """
+    from django.http import HttpResponse, Http404
+    from django.utils.encoding import smart_str
+    import os
+    import mimetypes
+    
+    try:
+        # Construct the full path to the static file
+        frontend_build_path = os.path.join(settings.BASE_DIR.parent, 'frontend_build')
+        file_path = os.path.join(frontend_build_path, 'static', path)
+        
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            # Determine the content type
+            content_type, _ = mimetypes.guess_type(file_path)
+            if not content_type:
+                content_type = 'application/octet-stream'
+            
+            # Read and serve the file
+            with open(file_path, 'rb') as f:
+                response = HttpResponse(f.read(), content_type=content_type)
+                
+            # Add caching headers for static files
+            response['Cache-Control'] = 'public, max-age=31536000'  # 1 year
+            return response
+        else:
+            raise Http404(f"Static file not found: {path}")
+            
+    except Exception as e:
+        return HttpResponse(f"Error serving static file: {str(e)}", status=500)
+
+
+def employee_portal_view(request):
+    """
+    Employee portal entry point - serves React frontend
+    This is the main entry point for the employee portal
+    """
+    # Add tenant detection logic here if needed
+    request.tenant = {
+        'id': '1',
+        'name': 'Default Company',
+        'subdomain': 'default'
+    }
+    
+    return serve_react_frontend(request)
+
+
+def tenant_frontend_view(request, tenant_subdomain=None):
+    """
+    Tenant-specific frontend view
+    Handles tenant routing based on subdomain or path
+    """
+    # Extract tenant information
+    if not tenant_subdomain:
+        # Try to get from subdomain
+        host = request.get_host()
+        if host.count('.') > 1:
+            tenant_subdomain = host.split('.')[0]
+        else:
+            tenant_subdomain = 'default'
+    
+    # Set tenant information for the request
+    request.tenant = {
+        'id': tenant_subdomain,
+        'name': f'{tenant_subdomain.title()} Company',
+        'subdomain': tenant_subdomain
+    }
+    
+    return serve_react_frontend(request)

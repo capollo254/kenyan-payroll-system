@@ -5,7 +5,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
-from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check_secure, create_admin_disabled
+from apps.core.views import welcome, calculator_page, api_root, user_logout_view, user_login_view, my_payslips_view, test_simple_view, payslips_view_fixed, api_docs_view_fixed, calculator_view_fixed, debug_user_check_secure, create_admin_disabled, serve_react_frontend, serve_react_static, employee_portal_view, tenant_frontend_view
 from apps.core.contact_views import contact_form_view, contact_form_submit
 from apps.payroll.calculator_views import public_payroll_calculator
 import os
@@ -49,6 +49,28 @@ urlpatterns = [
     
     # Public Calculator API (no authentication required)
     path('api/public/calculator/', public_payroll_calculator, name='public_calculator'),
+    
+    # ===================================================================
+    # REACT FRONTEND ROUTES - SaaS Multi-Tenant Setup
+    # ===================================================================
+    
+    # Main employee portal (React frontend)
+    path('employee-portal/', employee_portal_view, name='employee_portal'),
+    path('frontend/', employee_portal_view, name='frontend_main'),
+    
+    # Tenant-specific routes
+    path('tenant/<str:tenant_subdomain>/', tenant_frontend_view, name='tenant_frontend'),
+    
+    # React static files (CSS, JS, etc.)
+    path('frontend-static/<path:path>', serve_react_static, name='react_static'),
+    
+    # Catch-all route for React routing (should be near the end)
+    path('app/', serve_react_frontend, name='react_app'),
+    path('app/<path:route>', serve_react_frontend, name='react_app_routes'),
+    
+    # ===================================================================
+    # API ENDPOINTS
+    # ===================================================================
     
     # Authenticated API endpoints
     path('api/v1/auth/', include('apps.core.urls')),

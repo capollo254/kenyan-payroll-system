@@ -81,6 +81,12 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'apps.core.authentication.InactivityMiddleware',  # Custom inactivity middleware
+    
+    # Multi-tenant middleware (add after authentication)
+    'apps.core.middleware.TenantMiddleware',  # Detect tenant from subdomain/domain
+    'apps.core.middleware.TenantUserMiddleware',  # Check user tenant access
+    'apps.core.middleware.TenantDatabaseMiddleware',  # Tenant database context
+    
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
