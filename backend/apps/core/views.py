@@ -2180,16 +2180,13 @@ def react_frontend_fixed(request):
     from django.http import HttpResponse
     from django.middleware.csrf import get_token
     
-    # Check if user is already authenticated and has employee profile
+    # Check if user is already authenticated and show dashboard
     if request.user.is_authenticated:
-        try:
-            # Check if user has an employee profile
-            employee_profile = request.user.employee_profile
-            # If user is already logged in and has employee profile, show the dashboard
-            user = request.user
-            user_name = user.first_name or user.email.split('@')[0] if user.email else 'Employee'
-            
-            html_content = f"""
+        # If user is already logged in, show the dashboard
+        user = request.user
+        user_name = user.first_name or user.email.split('@')[0] if user.email else 'Employee'
+        
+        html_content = f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -2499,21 +2496,9 @@ def react_frontend_fixed(request):
             </script>
         </body>
         </html>
-            """
-            
-            return HttpResponse(html_content, content_type='text/html')
-            
-        except:
-            # User is authenticated but has no employee profile
-            # Check if they're staff/admin and redirect appropriately
-            if request.user.is_staff or request.user.is_superuser:
-                messages.info(request, 'You are logged in as an administrator. Access the admin panel instead.')
-                return redirect('/')
-            else:
-                # User has no employee profile and is not staff - show error and logout
-                from django.contrib.auth import logout
-                logout(request)
-                messages.error(request, 'Your account is not configured as an employee. Please contact your administrator.')
+        """
+        
+        return HttpResponse(html_content, content_type='text/html')
     
     # Create a fully responsive Employee Portal
     html_content = f"""
