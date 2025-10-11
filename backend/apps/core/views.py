@@ -200,7 +200,7 @@ def render_public_landing(request):
             <div class="section" style="text-align: center;">
                 <h2>👥 For Organizations & Employees</h2>
                 <p><strong>Primary Access:</strong> Use our main employee portal for full payroll system access</p>
-                <a href="/employee-portal/" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
+                <a href="/login/" class="button login" style="background: #27ae60; font-size: 18px; padding: 15px 30px; margin: 10px;" target="_blank">
                     🌟 Employee Portal Login
                 </a>
                 <p style="margin: 20px 0; color: #7f8c8d;"><em>Access payslips, profile, leave requests, and admin features</em></p>
@@ -208,7 +208,7 @@ def render_public_landing(request):
                 <hr style="margin: 30px 0; border: 1px solid #ecf0f1;">
                 
                 <p><strong>Alternative Access:</strong> System administrators and API access</p>
-                <a href="/employee-portal/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
+                <a href="/login/" class="button" style="background: #8e44ad; margin: 5px;">🔐 Staff Login Only</a>
                 <a href="/admin/" class="button" style="background: #e74c3c; margin: 5px;" target="_blank">Django Admin</a>
             </div>
             
@@ -276,7 +276,7 @@ def render_internal_dashboard(request):
                 </div>
                 <p style="text-align: center; margin-top: 20px;">
                     <em>For the best experience, use our main employee portal: 
-                    <a href="/employee-portal/" style="color: #27ae60;" target="_blank">Employee Portal</a>
+                    <a href="/login/" style="color: #27ae60;" target="_blank">Employee Portal</a>
                     </em>
                 </p>
             </div>'''
@@ -1045,7 +1045,7 @@ def user_login_view(request):
             
             <div class="help-text">
                 <p><strong>⚠️ STAFF ACCESS ONLY:</strong> This login is restricted to staff members only.</p>
-                <p><strong>For Employees:</strong> <a href="/employee-portal/" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
+                <p><strong>For Employees:</strong> <a href="/login/" style="color: #27ae60;" target="_blank">Use Main Employee Portal</a></p>
                 <p><strong>For Admin Access:</strong> <a href="/admin/" style="color: #3498db;" target="_blank">Use Django Admin</a></p>
                 <p>Regular employees should use the main portal for full system access.</p>
             </div>
@@ -1284,7 +1284,7 @@ def api_docs_view_fixed(request):
 
                 <div class="nav-links">
                     <a href="/calculator/">Try Calculator</a>
-                    <a href="/employee-portal/">Login</a>
+                    <a href="/login/">Login</a>
                     <a href="/">Home</a>
                 </div>
             </div>
@@ -2142,99 +2142,3 @@ def create_admin_disabled(request):
         "contact": "Contact system administrator for admin account creation",
         "timestamp": "2025-10-02T17:40:00Z"
     }, status=403)
-
-
-def react_frontend(request):
-    """
-    Serve the React frontend application
-    """
-    from django.http import HttpResponse
-    from django.conf import settings
-    import os
-    
-    try:
-        # Path to the React build index.html
-        frontend_path = os.path.join(settings.BASE_DIR.parent, 'frontend_build', 'index.html')
-        
-        with open(frontend_path, 'r', encoding='utf-8') as f:
-            html_content = f.read()
-        
-        return HttpResponse(html_content, content_type='text/html')
-    except FileNotFoundError:
-        return HttpResponse("""
-        <html>
-        <head><title>Frontend Not Available</title></head>
-        <body>
-            <h1>React Frontend Not Available</h1>
-            <p>The React frontend build files are not found.</p>
-            <p><a href="/">Return to Main Site</a></p>
-        </body>
-        </html>
-        """, content_type='text/html')
-
-
-def react_frontend_fixed(request):
-    """
-    Serve the React frontend application with proper static file URLs
-    """
-    from django.http import HttpResponse
-    from django.conf import settings
-    import os
-
-    try:
-        # Path to the React build index.html
-        frontend_path = os.path.join(settings.BASE_DIR.parent, 'frontend_build', 'index.html')
-        
-        with open(frontend_path, 'r', encoding='utf-8') as f:
-            html_content = f.read()
-        
-        # Fix static file URLs to work with Django
-        html_content = html_content.replace('/static/', '/frontend-static/')
-        
-        return HttpResponse(html_content, content_type='text/html')
-    except FileNotFoundError:
-        return HttpResponse("""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Frontend Not Available</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 50px; }
-                .container { max-width: 600px; margin: 0 auto; text-align: center; }
-                .button { display: inline-block; padding: 10px 20px; background: #007cba; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>🚧 React Frontend Loading...</h1>
-                <p>The React frontend is being prepared. Please try again in a moment.</p>
-                <a href="/" class="button">Return to Main Site</a>
-                <a href="/login/" class="button">Django Login</a>
-            </div>
-        </body>
-        </html>
-        """, content_type='text/html')
-
-    except FileNotFoundError:
-        return HttpResponse("""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Frontend Not Available</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 50px; }
-                .container { max-width: 600px; margin: 0 auto; text-align: center; }
-                .button { display: inline-block; padding: 10px 20px; background: #007cba; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>🚧 React Frontend Loading...</h1>
-                <p>The React frontend is being prepared. Please try again in a moment.</p>
-                <a href="/" class="button">Return to Main Site</a>
-                <a href="/login/" class="button">Django Login</a>
-            </div>
-        </body>
-        </html>
-        """, content_type='text/html')
-
