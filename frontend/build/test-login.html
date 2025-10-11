@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Login Test - Direct API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Direct API Login Test</h1>
+        <p>This test directly calls the Django API from this standalone page.</p>
+        
+        <!-- Login Test -->
+        <div class="test-section">
+            <h3>Login Test</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="admin@test.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="admin123" required>
+                </div>
+                <button type="submit">Test Login</button>
+                <button type="button" onclick="clearStorage()">Clear Storage</button>
+            </form>
+            <div id="loginStatus"></div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="test-section">
+            <h3>Instructions</h3>
+            <p>1. Make sure Django server is running on port 8000</p>
+            <p>2. Click "Test Login" to verify the API works</p>
+            <p>3. Check if you get immediate inactivity warnings (you shouldn't!)</p>
+            <p>4. If this works, then try your React frontend at <a href="http://localhost:3002" target="_blank">http://localhost:3002</a></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+        
+        function showStatus(elementId, message, type) {
+            const statusDiv = document.getElementById(elementId);
+            statusDiv.innerHTML = message;
+            statusDiv.className = 'status ' + type;
+        }
+
+        // Test login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                showStatus('loginStatus', 'Attempting login...', 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Login response:', data);
+                    
+                    // Store token for testing
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    showStatus('loginStatus', 
+                        `✅ API Login successful!<br>
+                        Token: ${data.token.substring(0, 20)}...<br>
+                        Role: ${data.role}<br>
+                        <strong>No inactivity warnings should appear!</strong><br>
+                        <em>Now try your React app at <a href="http://localhost:3002" target="_blank">localhost:3002</a></em>`, 
+                        'success'
+                    );
+                } else {
+                    const errorText = await response.text();
+                    console.error('Login error:', errorText);
+                    showStatus('loginStatus', `❌ Login failed: ${response.status}<br>${errorText}`, 'error');
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showStatus('loginStatus', `❌ Network error: ${error.message}`, 'error');
+            }
+        });
+
+        // Clear storage
+        function clearStorage() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('loginTime');
+            showStatus('loginStatus', '🗑️ Storage cleared', 'info');
+        }
+
+        // Check for existing tokens on page load
+        window.addEventListener('load', () => {
+            const existingToken = localStorage.getItem('token');
+            if (existingToken) {
+                showStatus('loginStatus', 
+                    `ℹ️ Found existing token: ${existingToken.substring(0, 20)}...<br>
+                    This test verifies no immediate logout warnings occur.`, 
+                    'info'
+                );
+            }
+        });
+    </script>
+</body>
+</html>

@@ -2165,6 +2165,9 @@ def serve_react_frontend(request):
             with open(index_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
+            # Fix static file paths - Replace /static/ with /frontend-static/
+            html_content = html_content.replace('/static/', '/frontend-static/')
+            
             # Add tenant information to the HTML if available
             tenant_info = getattr(request, 'tenant', None)
             if tenant_info:
