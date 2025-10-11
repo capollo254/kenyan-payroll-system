@@ -2179,9 +2179,6 @@ def react_frontend_fixed(request):
     """
     from django.http import HttpResponse
     from django.middleware.csrf import get_token
-    from django.contrib.auth import authenticate, login
-    from django.contrib import messages
-    from django.shortcuts import redirect
     
     # Check if user is already authenticated and has employee profile
     if request.user.is_authenticated:
@@ -2518,42 +2515,6 @@ def react_frontend_fixed(request):
                 logout(request)
                 messages.error(request, 'Your account is not configured as an employee. Please contact your administrator.')
     
-    # Handle login form submission for anonymous users
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
-        if email and password:
-            # Authenticate user with email
-            user = authenticate(request, username=email, password=password)
-            
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    
-                    # Determine redirect based on user type and employee profile
-                    try:
-                        # Check if user has an employee profile
-                        employee_profile = user.employee_profile
-                        # User has employee profile - redirect to employee portal
-                        messages.success(request, f'Welcome back, {user.first_name or user.email}! Taking you to your dashboard.')
-                        return redirect('/employee/')  # This will now show the dashboard
-                    except:
-                        # User has no employee profile - check if they're staff/admin
-                        if user.is_staff or user.is_superuser:
-                            messages.success(request, f'Welcome back, {user.first_name or user.email}! Redirecting to admin area.')
-                            return redirect('/')
-                        else:
-                            # User is neither employee nor staff - show error
-                            messages.error(request, 'Your account is not configured as an employee. Please contact your administrator.')
-                            return redirect('/employee/')
-                else:
-                    messages.error(request, 'Your account is inactive. Please contact your administrator.')
-            else:
-                messages.error(request, 'Invalid email or password. Please try again.')
-        else:
-            messages.error(request, 'Please enter both email and password.')
-    
     # Create a fully responsive Employee Portal
     html_content = f"""
     <!DOCTYPE html>
@@ -2629,30 +2590,7 @@ def react_frontend_fixed(request):
                 font-size: 1.1em;
                 font-weight: 300;
             }}
-            
-            .messages {{
-                margin-bottom: 20px;
-            }}
-            
-            .message {{
-                padding: 12px 15px;
-                border-radius: 8px;
-                margin-bottom: 10px;
-                font-weight: 500;
-            }}
-            
-            .message.success {{
-                background: #d4edda;
-                color: #155724;
-                border: 1px solid #c3e6cb;
-            }}
-            
-            .message.error {{
-                background: #f8d7da;
-                color: #721c24;
-                border: 1px solid #f5c6cb;
-            }}
-            
+
             .login-form {{ 
                 margin-top: 30px; 
             }}
@@ -2874,13 +2812,8 @@ def react_frontend_fixed(request):
             <h1>Employee Portal</h1>
             <p class="subtitle">Kenya Payroll System</p>
 
-            <!-- Display messages -->
-            <div class="messages">
-                {"".join([f'<div class="message {msg.tags}">{msg.message}</div>' for msg in messages.get_messages(request)])}
-            </div>
-
             <div class="login-form">
-                <form method="post" id="loginForm">
+                <form method="post" action="/api/v1/auth/login/" id="loginForm">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">
 
                     <div class="form-group">
