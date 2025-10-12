@@ -1,0 +1,30 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "email": "admin@system.com",
+      "first_name": "System",
+      "last_name": "Admin",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "password": "pbkdf2_sha256$600000$dummy$hash",
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user", 
+    "pk": 2,
+    "fields": {
+      "email": "constantive@gmail.com",
+      "first_name": "Admin",
+      "last_name": "User", 
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "password": "pbkdf2_sha256$600000$dummy$hash",
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  }
+]
