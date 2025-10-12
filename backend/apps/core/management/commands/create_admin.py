@@ -104,3 +104,48 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS("=" * 50)
         )
+        
+        # Also create the system admin user for tenants
+        self.create_system_admin()
+    
+    def create_system_admin(self):
+        """Create the system admin user for tenant management"""
+        try:
+            User = get_user_model()
+            system_email = "admin@system.com"
+            system_password = "admin123"
+            
+            if User.objects.filter(email=system_email).exists():
+                self.stdout.write(
+                    self.style.WARNING(f"🔄 System admin {system_email} already exists!")
+                )
+                user = User.objects.get(email=system_email)
+                user.set_password(system_password)
+                user.save()
+            else:
+                User.objects.create_user(
+                    email=system_email,
+                    password=system_password,
+                    first_name="System",
+                    last_name="Admin",
+                    is_staff=True,
+                    is_superuser=True,
+                    is_active=True
+                )
+                self.stdout.write(
+                    self.style.SUCCESS(f"✅ System admin created: {system_email}")
+                )
+                
+            self.stdout.write(
+                self.style.SUCCESS("🔑 ADDITIONAL LOGIN:")
+            )
+            self.stdout.write(
+                self.style.SUCCESS(f"📧 EMAIL: {system_email}")
+            )
+            self.stdout.write(
+                self.style.SUCCESS(f"🔒 PASSWORD: {system_password}")
+            )
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(f"❌ Error creating system admin: {e}")
+            )
