@@ -60,29 +60,11 @@ class TenantMiddleware(MiddlewareMixin):
     def get_tenant_from_request(self, request):
         """
         Extract tenant information from the request
-        Priority: Custom domain > Subdomain > Path parameter
+        Priority: Path parameter > Custom domain > Subdomain > Default
         """
         tenant = None
         
-        # Method 1: Check for custom domain
-        host = request.get_host().split(':')[0]  # Remove port if present
-        try:
-            tenant = Tenant.objects.get(domain=host, is_active=True)
-            return tenant
-        except Tenant.DoesNotExist:
-            pass
-        
-        # Method 2: Check for subdomain
-        if '.' in host and not self.is_local_development(host):
-            subdomain = host.split('.')[0]
-            if subdomain and subdomain != 'www':
-                try:
-                    tenant = Tenant.objects.get(subdomain=subdomain, is_active=True)
-                    return tenant
-                except Tenant.DoesNotExist:
-                    pass
-        
-        # Method 3: Check for tenant in path (/tenant/subdomain/)
+        # Method 1: Check for tenant in path (/tenant/subdomain/)
         path_parts = request.path_info.strip('/').split('/')
         if len(path_parts) >= 2 and path_parts[0] == 'tenant':
             subdomain = path_parts[1]
@@ -92,7 +74,33 @@ class TenantMiddleware(MiddlewareMixin):
             except Tenant.DoesNotExist:
                 pass
         
-        # Method 4: Default tenant for development
+        # Method 2: Check for specific frontend paths that should use default tenant
+        if request.path_info.startswith('/employee-portal') or request.path_info.startswith('/app'):
+            try:
+                tenant = Tenant.objects.get(subdomain='default', is_active=True)
+                return tenant
+            except Tenant.DoesNotExist:
+                pass
+        
+        # Method 3: Check for custom domain
+        host = request.get_host().split(':')[0]  # Remove port if present
+        try:
+            tenant = Tenant.objects.get(domain=host, is_active=True)
+            return tenant
+        except Tenant.DoesNotExist:
+            pass
+        
+        # Method 4: Check for subdomain
+        if '.' in host and not self.is_local_development(host):
+            subdomain = host.split('.')[0]
+            if subdomain and subdomain != 'www':
+                try:
+                    tenant = Tenant.objects.get(subdomain=subdomain, is_active=True)
+                    return tenant
+                except Tenant.DoesNotExist:
+                    pass
+        
+        # Method 5: Default tenant for local development
         if self.is_local_development(host):
             try:
                 tenant = Tenant.objects.filter(

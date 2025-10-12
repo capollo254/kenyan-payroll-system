@@ -2169,19 +2169,41 @@ def serve_react_frontend(request):
             html_content = html_content.replace('/static/', '/frontend-static/')
             
             # Add tenant information to the HTML if available
-            tenant_info = getattr(request, 'tenant', None)
-            if tenant_info:
+            tenant_obj = getattr(request, 'tenant_obj', None)
+            if tenant_obj:
                 # Inject tenant data into the HTML
                 tenant_script = f"""
                 <script>
                     window.TENANT_INFO = {{
-                        'id': '{tenant_info.get("id", "")}',
-                        'name': '{tenant_info.get("name", "")}',
-                        'subdomain': '{tenant_info.get("subdomain", "")}'
+                        'id': '{tenant_obj.id}',
+                        'name': '{tenant_obj.company_name}',
+                        'subdomain': '{tenant_obj.subdomain}',
+                        'subscription_plan': '{tenant_obj.subscription_plan}',
+                        'subscription_status': '{tenant_obj.subscription_status}',
+                        'max_employees': {tenant_obj.max_employees},
+                        'features_enabled': {tenant_obj.features_enabled if hasattr(tenant_obj, 'features_enabled') else '{}'}
                     }};
+                    console.log('🏢 Tenant loaded:', window.TENANT_INFO);
                 </script>
                 """
                 html_content = html_content.replace('</head>', f'{tenant_script}</head>')
+            else:
+                # Default tenant info if no tenant detected
+                default_script = """
+                <script>
+                    window.TENANT_INFO = {
+                        'id': 'default',
+                        'name': 'Default Company',
+                        'subdomain': 'default',
+                        'subscription_plan': 'trial',
+                        'subscription_status': 'trial',
+                        'max_employees': 50,
+                        'features_enabled': {}
+                    };
+                    console.log('🏢 Default tenant loaded:', window.TENANT_INFO);
+                </script>
+                """
+                html_content = html_content.replace('</head>', f'{default_script}</head>')
             
             return HttpResponse(html_content, content_type='text/html')
         else:
@@ -2231,14 +2253,28 @@ def serve_react_static(request, path):
 def employee_portal_view(request):
     """
     Employee portal entry point - serves React frontend
-    This is the main entry point for the employee portal
+    This is the main entry point for the employee portal (default tenant)
     """
-    # Add tenant detection logic here if needed
-    request.tenant = {
-        'id': '1',
-        'name': 'Default Company',
-        'subdomain': 'default'
-    }
+    from .models import Tenant
+    
+    # Ensure we have a default tenant set
+    if not hasattr(request, 'tenant_obj') or request.tenant_obj is None:
+        try:
+            default_tenant = Tenant.objects.get(subdomain='default')
+            request.tenant_obj = default_tenant
+            request.tenant = default_tenant.subdomain
+        except Tenant.DoesNotExist:
+            # Create default tenant if it doesn't exist
+            default_tenant = Tenant.objects.create(
+                subdomain='default',
+                company_name='Default Company',
+                subscription_plan='trial',
+                subscription_status='trial',
+                max_employees=50,
+                billing_email='admin@default.com'
+            )
+            request.tenant_obj = default_tenant
+            request.tenant = default_tenant.subdomain
     
     return serve_react_frontend(request)
 
@@ -2248,20 +2284,25 @@ def tenant_frontend_view(request, tenant_subdomain=None):
     Tenant-specific frontend view
     Handles tenant routing based on subdomain or path
     """
-    # Extract tenant information
-    if not tenant_subdomain:
-        # Try to get from subdomain
-        host = request.get_host()
-        if host.count('.') > 1:
-            tenant_subdomain = host.split('.')[0]
-        else:
-            tenant_subdomain = 'default'
+    from .models import Tenant
+    from django.http import Http404
     
-    # Set tenant information for the request
-    request.tenant = {
-        'id': tenant_subdomain,
-        'name': f'{tenant_subdomain.title()} Company',
-        'subdomain': tenant_subdomain
-    }
+    # Get tenant subdomain from URL parameter
+    if tenant_subdomain:
+        try:
+            tenant_obj = Tenant.objects.get(subdomain=tenant_subdomain)
+            request.tenant_obj = tenant_obj
+            request.tenant = tenant_obj.subdomain
+        except Tenant.DoesNotExist:
+            raise Http404(f"Tenant '{tenant_subdomain}' not found")
+    else:
+        # Fall back to middleware detection or default
+        if not hasattr(request, 'tenant_obj') or request.tenant_obj is None:
+            try:
+                default_tenant = Tenant.objects.get(subdomain='default')
+                request.tenant_obj = default_tenant
+                request.tenant = default_tenant.subdomain
+            except Tenant.DoesNotExist:
+                raise Http404("No tenant found")
     
     return serve_react_frontend(request)
